@@ -39,11 +39,13 @@ namespace DiscordVPNManager {
   private void BuildUi() {
    SuspendLayout();
    var shell=new TableLayoutPanel{Dock=DockStyle.Fill,ColumnCount=2,RowCount=1,Margin=Padding.Empty,Padding=Padding.Empty,BackColor=ColorBg};
-   shell.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,224));shell.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,100));shell.RowStyles.Add(new RowStyle(SizeType.Percent,100));Controls.Add(shell);
+   shell.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,224));shell.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,100));shell.RowStyles.Add(new RowStyle(SizeType.Percent,100));var frame=new TableLayoutPanel{Dock=DockStyle.Fill,ColumnCount=1,RowCount=2,Margin=Padding.Empty,Padding=Padding.Empty,BackColor=ColorBg};
+   frame.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,100));frame.RowStyles.Add(new RowStyle(SizeType.Absolute,38));frame.RowStyles.Add(new RowStyle(SizeType.Percent,100));Controls.Add(frame);
+   frame.Controls.Add(BuildCaption(),0,0);frame.Controls.Add(shell,0,1);
    var side=new Panel{Dock=DockStyle.Fill,BackColor=Color.FromArgb(18,20,32),Margin=Padding.Empty};shell.Controls.Add(side,0,0);
    var logo=new PictureBox{Location=new Point(24,30),Size=new Size(48,48),SizeMode=PictureBoxSizeMode.Zoom};
    using(var stream=Assembly.GetExecutingAssembly().GetManifestResourceStream("logo-transparent.png")){if(stream!=null){using(var im=Image.FromStream(stream))logo.Image=new Bitmap(im);}}side.Controls.Add(logo);
-   LabelAt(side,"Discord VPN",24,90,190,44,19,ColorText,FontStyle.Bold);LabelAt(side,"MANAGER / WINDOWS",26,140,190,24,8.2f,ColorMuted);
+   LabelAt(side,"Discord VPN",24,90,190,44,19,ColorText,FontStyle.Bold);LabelAt(side,"CONEXÃO SÓ PARA O DISCORD",26,140,190,24,7.7f,ColorMuted);
    LabelAt(side,"SEU ESPAÇO",26,200,184,18,8,ColorMuted,FontStyle.Bold);
    var navConnect=MakeButton("  Visão geral",16,232,192,46,side.BackColor);navConnect.TextAlign=ContentAlignment.MiddleLeft;side.Controls.Add(navConnect);
    var navProfiles=MakeButton("  Perfis WireGuard",16,286,192,46,side.BackColor);navProfiles.TextAlign=ContentAlignment.MiddleLeft;side.Controls.Add(navProfiles);
@@ -62,7 +64,7 @@ namespace DiscordVPNManager {
    int cw=808;
    var pageTitle=LabelAt(canvas,"Sua conexão, sob controle.",24,16,700,52,24,ColorText,FontStyle.Bold);
    var pageSubtitle=LabelAt(canvas,"Escolha um perfil. Conecte. Abra o Discord.",26,72,700,26,10,ColorMuted);
-   var hero=Card(canvas,110,188,cw);hero.GradientEnd=Color.FromArgb(39,30,60);hero.BorderColor=Color.FromArgb(65,49,91);
+   var hero=Card(canvas,110,188,cw);hero.GradientEnd=Color.FromArgb(36,29,57);hero.BorderColor=Color.FromArgb(64,52,91);
    _lblTunnel=LabelAt(hero,"Desconectado",22,12,440,50,23,ColorRed,FontStyle.Bold);
    _lblSingbox=LabelAt(hero,"Conecte um perfil para começar.",24,64,420,26,10,ColorMuted);
    _lblActive=LabelAt(hero,"Perfil ativo: —",24,94,480,26,9.3f,Color.FromArgb(207,198,228));
@@ -98,14 +100,17 @@ namespace DiscordVPNManager {
    var activity=Card(canvas,692,110,cw);LabelAt(activity,"Atividade recente",18,9,360,25,10,ColorText,FontStyle.Bold);
    _log=new TextBox{Location=new Point(18,39),Size=new Size(772,55),Multiline=true,ReadOnly=true,ScrollBars=ScrollBars.Vertical,BorderStyle=BorderStyle.None,BackColor=ColorPanel,ForeColor=ColorMuted,Font=new Font("Consolas",8.3f),TabStop=false,Anchor=AnchorStyles.Left|AnchorStyles.Top|AnchorStyles.Right};activity.Controls.Add(_log);
    _navButtons=new Button[]{navConnect,navProfiles,navActivity};
-   var manage=MakeButton("Gerenciar perfis",24,428,200,42,ColorSecondary);canvas.Controls.Add(manage);
+   var shortcut=Card(canvas,428,112,cw);
+   LabelAt(shortcut,"Seu próximo servidor",20,13,420,32,14,ColorText,FontStyle.Bold);
+   LabelAt(shortcut,"Importe e escolha seus perfis .conf do Proton VPN.",21,55,470,26,9,ColorMuted);
+   var manage=MakeButton("Escolher perfil  ↗",603,35,185,42,ColorSecondary);manage.Anchor=AnchorStyles.Top|AnchorStyles.Right;shortcut.Controls.Add(manage);
    manage.Click+=delegate{_navigate(1);};
    Action layoutSection=delegate{
     int width=Math.Max(Logical(650),canvas.ClientSize.Width-Logical(48));
-    hero.Width=profiles.Width=startup.Width=activity.Width=width;
+    hero.Width=profiles.Width=startup.Width=activity.Width=shortcut.Width=width;
     if(_activeSection==0){
-     hero.Top=Logical(110);startup.Top=Logical(316);manage.Top=Logical(428);
-     canvas.Height=Logical(494);
+     hero.Top=Logical(110);startup.Top=Logical(316);shortcut.Top=Logical(428);
+     canvas.Height=Logical(560);
     }else if(_activeSection==1){
      profiles.Top=Logical(110);profiles.Height=Logical(350);
      _list.Height=Logical(228);
@@ -122,7 +127,7 @@ namespace DiscordVPNManager {
     _page.AutoScrollPosition=Point.Empty;
     canvas.SuspendLayout();
     hero.Visible=section!=2;profiles.Visible=section==1;startup.Visible=section==0;
-    activity.Visible=section==2;manage.Visible=section==0;
+    activity.Visible=section==2;shortcut.Visible=section==0;
     pageTitle.Text=section==0?"Sua conexão, sob controle.":section==1?"Seus perfis WireGuard":"Atividade da conexão";
     pageSubtitle.Text=section==0?"Conexão e inicialização do Discord.":section==1?"Importe um .conf e selecione o perfil para conectar.":"Acompanhe os eventos e mensagens do Manager.";
     for(int i=0;i<_navButtons.Length;i++){

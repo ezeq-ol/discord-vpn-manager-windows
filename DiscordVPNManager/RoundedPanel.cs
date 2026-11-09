@@ -8,7 +8,7 @@ namespace DiscordVPNManager {
   public Color BorderColor {get;set;}
   public RoundedPanel(){DoubleBuffered=true;GradientEnd=Color.Empty;BorderColor=Color.FromArgb(37,41,58);}
   protected override void OnResize(EventArgs e){base.OnResize(e);if(Width>32&&Height>32){var old=Region;Region=RoundedShape.Create(Width,Height,16);if(old!=null)old.Dispose();}Invalidate();}
-  protected override void OnPaintBackground(PaintEventArgs e){if(Width<2||Height<2)return;using(var brush=new LinearGradientBrush(ClientRectangle,BackColor,GradientEnd.IsEmpty?BackColor:GradientEnd,LinearGradientMode.ForwardDiagonal))e.Graphics.FillRectangle(brush,ClientRectangle);}
+  protected override void OnPaintBackground(PaintEventArgs e){if(Width<2||Height<2)return;e.Graphics.Clear(Parent==null?BackColor:Parent.BackColor);e.Graphics.SmoothingMode=SmoothingMode.AntiAlias;using(var path=RoundedShape.Path(new RectangleF(0,0,Width,Height),16))using(var brush=new LinearGradientBrush(ClientRectangle,BackColor,GradientEnd.IsEmpty?BackColor:GradientEnd,LinearGradientMode.ForwardDiagonal))e.Graphics.FillPath(brush,path);}
   protected override void OnPaint(PaintEventArgs e){base.OnPaint(e);if(Width<32||Height<32)return;e.Graphics.SmoothingMode=SmoothingMode.AntiAlias;using(var p=RoundedShape.Path(new RectangleF(.5f,.5f,Width-1,Height-1),16))using(var pen=new Pen(BorderColor))e.Graphics.DrawPath(pen,p);}
  }
 }

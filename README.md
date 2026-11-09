@@ -69,3 +69,7 @@ A interface usa coordenadas lógicas de 96 DPI e dimensiona seus controles confo
 ### Navegação — 1.3.2
 
 Os botões laterais alternam entre Visão geral (conexão e inicialização), Perfis WireGuard (lista e controles da VPN) e Atividade (histórico ampliado). A página selecionada fica destacada. A navegação mantém o perfil selecionado e as mensagens de atividade.
+
+### Interface escura completa — 1.4.0
+
+O topo agora usa uma barra escura própria. Arraste pelo título para mover, dê duplo clique para maximizar/restaurar e use os botões à direita para minimizar, maximizar ou ocultar na bandeja. A janela continua redimensionável pelas bordas. A Visão geral ganhou um cartão de acesso aos perfis; botões e seleção lateral receberam novos contornos e cores. Os testes também verificam os controles da janela e o redimensionamento.

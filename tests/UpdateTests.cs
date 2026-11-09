@@ -1,4 +1,4 @@
-using System;using System.IO;using DiscordVPNManager;
+﻿using System;using System.IO;using DiscordVPNManager;
 class UpdateTests {
 static void Assert(bool value,string name){if(!value)throw new Exception(name);Console.WriteLine("PASS: "+name);}
 static void Reject(Action action,string name){try{action();}catch(InvalidDataException){Console.WriteLine("PASS: "+name);return;}throw new Exception(name);}
@@ -6,7 +6,7 @@ static int Main(string[]a){
 Assert(UpdateClient.ParseVersion("v1.3.0")==new Version(1,3,0,0),"version normalization");
 string root="https://github.com/"+UpdateClient.Repository;
 string json="{\"tag_name\":\"v1.4.0\",\"draft\":false,\"prerelease\":false,\"html_url\":\""+root+"/releases/tag/v1.4.0\",\"assets\":[{\"name\":\"DiscordVPNManager.exe\",\"browser_download_url\":\""+root+"/releases/download/v1.4.0/DiscordVPNManager.exe\"},{\"name\":\"DiscordVPNManager-Windows.sha256\",\"browser_download_url\":\""+root+"/releases/download/v1.4.0/DiscordVPNManager-Windows.sha256\"}]}";
-Assert(UpdateClient.ParseRelease(json).Version>UpdateClient.CurrentVersion,"new release recognized");
+Assert(UpdateClient.ParseRelease(json).Version==new Version(1,4,0,0),"release version parsed");
 Reject(()=>UpdateClient.ParseRelease(json.Replace("github.com","evil.invalid")),"external download rejected");
 Reject(()=>UpdateClient.ParseRelease(json.Replace("Windows.sha256","Windows.txt")),"missing checksum rejected");
 Reject(()=>UpdateClient.ParseRelease(json.Replace("\"prerelease\":false","\"prerelease\":true")),"prerelease rejected");

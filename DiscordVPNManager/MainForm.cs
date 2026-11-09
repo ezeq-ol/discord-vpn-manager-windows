@@ -17,7 +17,7 @@ namespace DiscordVPNManager
 	{
 		private static readonly Color ColorBg = Color.FromArgb(15, 17, 26);
 
-		private static readonly Color ColorPanel = Color.FromArgb(26, 29, 43);
+		private static readonly Color ColorPanel = Color.FromArgb(24, 27, 40);
 
 		private static readonly Color ColorPanelSoft = Color.FromArgb(20, 23, 35);
 
@@ -27,7 +27,7 @@ namespace DiscordVPNManager
 
 		private static readonly Color ColorAccent = Color.FromArgb(139, 92, 246);
 
-		private static readonly Color ColorSecondary = Color.FromArgb(44, 48, 68);
+		private static readonly Color ColorSecondary = Color.FromArgb(38, 43, 61);
 
 		private static readonly Color ColorDanger = Color.FromArgb(125, 48, 70);
 
@@ -116,7 +116,7 @@ namespace DiscordVPNManager
 			BackColor = ColorBg;
 			ForeColor = ColorText;
 			Font = new Font("Segoe UI", 9.75f);
-			base.FormBorderStyle = FormBorderStyle.Sizable;
+			base.FormBorderStyle = FormBorderStyle.None;
 			base.MaximizeBox = true;
             MinimumSize = new Size(970, 700);
 			base.StartPosition = FormStartPosition.CenterScreen;
