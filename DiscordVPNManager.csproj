@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
     <AssemblyName>DiscordVPNManager</AssemblyName>
     <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
@@ -29,6 +29,7 @@
     <EmbeddedResource Include="sing-box.exe" LogicalName="sing-box.exe" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Remove="tests\**\*.cs" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web.Extensions" />
   </ItemGroup>
