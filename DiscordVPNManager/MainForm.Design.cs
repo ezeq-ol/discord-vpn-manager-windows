@@ -14,6 +14,9 @@ namespace DiscordVPNManager {
   private float _layoutScale=1f;
   private Action _resizeContent;
   private bool _layoutReady;
+  private Action<int> _navigate;
+  private int _activeSection;
+  private Button[] _navButtons;
   private int Logical(int pixels){return (int)Math.Round(pixels*_layoutScale);}
 
   private Label LabelAt(Control parent,string text,int x,int y,int w,int h,float size,Color color,FontStyle style=FontStyle.Regular) {
@@ -30,7 +33,7 @@ namespace DiscordVPNManager {
   protected override void OnShown(EventArgs e) {
    base.OnShown(e);
    if(WindowState==FormWindowState.Normal){var area=Screen.FromControl(this).WorkingArea;Size=new Size(Math.Min(Width,area.Width),Math.Min(Height,area.Height));Location=new Point(area.X+(area.Width-Width)/2,area.Y+(area.Height-Height)/2);}
-   _layoutReady=true;if(_resizeContent!=null)_resizeContent();
+   _layoutReady=true;if(_navigate!=null)_navigate(_activeSection);if(_resizeContent!=null)_resizeContent();
   }
 
   private void BuildUi() {
@@ -42,7 +45,7 @@ namespace DiscordVPNManager {
    using(var stream=Assembly.GetExecutingAssembly().GetManifestResourceStream("logo-transparent.png")){if(stream!=null){using(var im=Image.FromStream(stream))logo.Image=new Bitmap(im);}}side.Controls.Add(logo);
    LabelAt(side,"Discord VPN",24,90,190,44,19,ColorText,FontStyle.Bold);LabelAt(side,"MANAGER / WINDOWS",26,140,190,24,8.2f,ColorMuted);
    LabelAt(side,"SEU ESPAÇO",26,200,184,18,8,ColorMuted,FontStyle.Bold);
-   var navConnect=MakeButton("  Visão geral",16,232,192,46,Color.FromArgb(49,36,77));navConnect.TextAlign=ContentAlignment.MiddleLeft;side.Controls.Add(navConnect);
+   var navConnect=MakeButton("  Visão geral",16,232,192,46,side.BackColor);navConnect.TextAlign=ContentAlignment.MiddleLeft;side.Controls.Add(navConnect);
    var navProfiles=MakeButton("  Perfis WireGuard",16,286,192,46,side.BackColor);navProfiles.TextAlign=ContentAlignment.MiddleLeft;side.Controls.Add(navProfiles);
    var navActivity=MakeButton("  Atividade",16,340,192,46,side.BackColor);navActivity.TextAlign=ContentAlignment.MiddleLeft;side.Controls.Add(navActivity);
    var privacy=new RoundedPanel{Location=new Point(16,430),Size=new Size(192,114),BackColor=Color.FromArgb(28,30,45)};side.Controls.Add(privacy);
@@ -57,8 +60,8 @@ namespace DiscordVPNManager {
    _page=new Panel{Dock=DockStyle.Fill,AutoScroll=true,Margin=Padding.Empty,BackColor=ColorBg};shell.Controls.Add(_page,1,0);
    var canvas=new Panel{Dock=DockStyle.Top,Size=new Size(856,818),BackColor=ColorBg};_page.Controls.Add(canvas);
    int cw=808;
-   LabelAt(canvas,"Sua conexão, sob controle.",24,16,700,52,24,ColorText,FontStyle.Bold);
-   LabelAt(canvas,"Escolha um perfil. Conecte. Abra o Discord.",26,72,700,26,10,ColorMuted);
+   var pageTitle=LabelAt(canvas,"Sua conexão, sob controle.",24,16,700,52,24,ColorText,FontStyle.Bold);
+   var pageSubtitle=LabelAt(canvas,"Escolha um perfil. Conecte. Abra o Discord.",26,72,700,26,10,ColorMuted);
    var hero=Card(canvas,110,188,cw);hero.GradientEnd=Color.FromArgb(39,30,60);hero.BorderColor=Color.FromArgb(65,49,91);
    _lblTunnel=LabelAt(hero,"Desconectado",22,12,440,50,23,ColorRed,FontStyle.Bold);
    _lblSingbox=LabelAt(hero,"Conecte um perfil para começar.",24,64,420,26,10,ColorMuted);
@@ -94,8 +97,45 @@ namespace DiscordVPNManager {
    _btnStartup=MakeButton("Salvar opção",625,24,163,42,ColorSecondary);_btnStartup.Anchor=AnchorStyles.Top|AnchorStyles.Right;_btnStartup.Click+=delegate{StartupSupport.SaveStartup(this);};startup.Controls.Add(_btnStartup);
    var activity=Card(canvas,692,110,cw);LabelAt(activity,"Atividade recente",18,9,360,25,10,ColorText,FontStyle.Bold);
    _log=new TextBox{Location=new Point(18,39),Size=new Size(772,55),Multiline=true,ReadOnly=true,ScrollBars=ScrollBars.Vertical,BorderStyle=BorderStyle.None,BackColor=ColorPanel,ForeColor=ColorMuted,Font=new Font("Consolas",8.3f),TabStop=false,Anchor=AnchorStyles.Left|AnchorStyles.Top|AnchorStyles.Right};activity.Controls.Add(_log);
-   navConnect.Click+=delegate{_page.ScrollControlIntoView(hero);};navProfiles.Click+=delegate{_page.ScrollControlIntoView(profiles);_list.Focus();};navActivity.Click+=delegate{_page.ScrollControlIntoView(activity);};
-   _resizeContent=delegate{foreach(Control card in canvas.Controls){if(card is RoundedPanel)card.Width=Math.Max(Logical(650),canvas.ClientSize.Width-Logical(48));}};
+   _navButtons=new Button[]{navConnect,navProfiles,navActivity};
+   var manage=MakeButton("Gerenciar perfis",24,428,200,42,ColorSecondary);canvas.Controls.Add(manage);
+   manage.Click+=delegate{_navigate(1);};
+   Action layoutSection=delegate{
+    int width=Math.Max(Logical(650),canvas.ClientSize.Width-Logical(48));
+    hero.Width=profiles.Width=startup.Width=activity.Width=width;
+    if(_activeSection==0){
+     hero.Top=Logical(110);startup.Top=Logical(316);manage.Top=Logical(428);
+     canvas.Height=Logical(494);
+    }else if(_activeSection==1){
+     profiles.Top=Logical(110);profiles.Height=Logical(350);
+     _list.Height=Logical(228);
+     _btnAdd.Top=_btnOpenFolder.Top=_btnRefresh.Top=Logical(298);hint.Top=Logical(301);
+     hero.Top=Logical(478);canvas.Height=Logical(686);
+    }else{
+     activity.Top=Logical(110);activity.Height=Math.Max(Logical(300),_page.ClientSize.Height-Logical(134));
+     _log.Height=activity.Height-Logical(55);canvas.Height=activity.Bottom+Logical(24);
+    }
+   };
+   _navigate=delegate(int section){
+    if(section<0||section>2)return;
+    _activeSection=section;
+    _page.AutoScrollPosition=Point.Empty;
+    canvas.SuspendLayout();
+    hero.Visible=section!=2;profiles.Visible=section==1;startup.Visible=section==0;
+    activity.Visible=section==2;manage.Visible=section==0;
+    pageTitle.Text=section==0?"Sua conexão, sob controle.":section==1?"Seus perfis WireGuard":"Atividade da conexão";
+    pageSubtitle.Text=section==0?"Conexão e inicialização do Discord.":section==1?"Importe um .conf e selecione o perfil para conectar.":"Acompanhe os eventos e mensagens do Manager.";
+    for(int i=0;i<_navButtons.Length;i++){
+     ((RoundedButton)_navButtons[i]).IsSelected=i==section;
+     _navButtons[i].AccessibleDescription=i==section?"Página atual":"Abrir página";
+     _navButtons[i].Invalidate();
+    }
+    layoutSection();canvas.ResumeLayout(true);
+    _page.AutoScrollPosition=Point.Empty;
+   };
+   navConnect.Click+=delegate{_navigate(0);};navProfiles.Click+=delegate{_navigate(1);};navActivity.Click+=delegate{_navigate(2);};
+   _resizeContent=layoutSection;
+   _page.SizeChanged+=delegate{if(_layoutReady)_resizeContent();};
    canvas.SizeChanged+=delegate{if(_layoutReady)_resizeContent();};
    // Controls are authored in logical 96-DPI pixels. Set the baseline only
    // after the complete tree exists, so WinForms scales bounds once together.

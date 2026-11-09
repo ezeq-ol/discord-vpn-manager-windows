@@ -65,3 +65,7 @@ App pessoal independente, sem vínculo com Discord ou Proton. O nome e o ícone 
 ### Correção de escala — 1.3.1
 
 A interface usa coordenadas lógicas de 96 DPI e dimensiona seus controles conforme a escala do Windows. Os testes de layout medem a altura dos textos, largura dos botões, sobreposições e barras horizontais nos tamanhos normal, mínimo e maximizado. A correção foi validada localmente em 96 DPI (100%) e 120 DPI (125%, escala real do computador). Não é necessário alterar a escala do Windows.
+
+### Navegação — 1.3.2
+
+Os botões laterais alternam entre Visão geral (conexão e inicialização), Perfis WireGuard (lista e controles da VPN) e Atividade (histórico ampliado). A página selecionada fica destacada. A navegação mantém o perfil selecionado e as mensagens de atividade.
