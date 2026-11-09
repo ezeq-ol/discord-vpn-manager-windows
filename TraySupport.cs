@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -163,6 +163,13 @@ public static class TraySupport
 			StartupSupport.Attach(form);
 		}
 	}
+
+    public static void CloseForUpdate(Form form) {
+        TrayState state;
+        if(!states.TryGetValue(form,out state))throw new InvalidOperationException("Manager não encontrado na bandeja.");
+        state.Exiting=true;StartupSupport.CancelStartup();form.Close();
+        if(!form.IsDisposed)state.Exiting=false;
+    }
 
 	public static bool HideOnClose(Form form, FormClosingEventArgs e)
 	{

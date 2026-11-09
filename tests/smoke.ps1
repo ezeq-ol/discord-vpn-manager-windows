@@ -12,3 +12,9 @@ $exe=Join-Path $root 'dist\SmokeTests.exe'
 if($LASTEXITCODE -ne 0){throw 'Test compilation failed'}
 & $exe (Join-Path $root 'dist\DiscordVPNManager.exe')
 if($LASTEXITCODE -ne 0){throw 'Smoke test failed'}
+
+$updateTest=Join-Path $root 'dist\UpdateTests.exe'
+& $csc /nologo /r:System.Web.Extensions.dll ('/r:'+ (Join-Path $root 'dist\DiscordVPNManager.exe')) ('/out:'+ $updateTest) (Join-Path $PSScriptRoot 'UpdateTests.cs')
+if($LASTEXITCODE -ne 0){throw 'Updater test compilation failed'}
+& $updateTest (Join-Path $root 'dist\DiscordVPNManager.exe')
+if($LASTEXITCODE -ne 0){throw 'Updater tests failed'}

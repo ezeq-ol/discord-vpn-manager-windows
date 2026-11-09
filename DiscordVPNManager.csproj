@@ -30,5 +30,6 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Core" />
+    <Reference Include="System.Web.Extensions" />
   </ItemGroup>
 </Project>

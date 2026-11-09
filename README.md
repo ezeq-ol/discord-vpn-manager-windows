@@ -1,4 +1,4 @@
-# Discord VPN Manager — Windows
+﻿# Discord VPN Manager — Windows
 
 Gerenciador de perfis WireGuard que encaminha o Discord pela VPN e mantém os outros aplicativos na conexão normal.
 
@@ -9,7 +9,10 @@ Baixe o **DiscordVPNManager.exe** em [Releases](https://github.com/ezeq-ol/disco
 ## Recursos
 
 - Importação e seleção de perfis `.conf`.
-- Interface escura, ícone na bandeja e opção de desconectar e sair.
+- Interface redesenhada com navegação lateral, cartões de conexão, lista de perfis e janela redimensionável.
+- Ícone na bandeja e opção de desconectar e sair.
+- **Buscar atualizações** consulta a última release estável deste repositório e oferece baixar e instalar quando houver uma versão nova.
+- Link direto para baixar os perfis `.conf` no Proton VPN.
 - **Iniciar VPN com o Windows** registra **Discord VPN Manager** na aba Inicializar.
 - Ao entrar no Windows: Manager na bandeja → túnel pronto → abertura do Discord.
 - Sem túnel pronto, a abertura automática do Discord é cancelada após o prazo.
@@ -30,7 +33,9 @@ O arquivo `.csproj` também está disponível para IDEs. Execute `restore-runtim
 
 ## Estrutura para manutenção
 
-- `DiscordVPNManager/MainForm.cs`: interface, perfis e operações.
+- `DiscordVPNManager/MainForm.cs`: perfis e operações.
+- `DiscordVPNManager/MainForm.Design.cs`: interface e layout.
+- `DiscordVPNManager/MainForm.Updates.cs` e `UpdateClient.cs`: consulta, download e instalação de releases.
 - `StartupSupport.cs`: instância única, bandeja no logon e espera pela VPN antes do Discord.
 - `TraySupport.cs`: ícone, restauração da janela e desconectar/sair.
 - `Aplicar-VPN-Discord.ps1`: geração da configuração, tarefas e ativação/desativação do início automático.
@@ -45,9 +50,11 @@ O código da interface foi recuperado do executável da versão 1.2.0 e validado
 
 O executável instala os componentes em `%LOCALAPPDATA%/Programs/Discord Single-Tunneling`. Perfis e seleção ficam em `%LOCALAPPDATA%/DiscordVPNManager` e nos arquivos importados pelo usuário. Ativar o túnel e configurar sua tarefa exigem a autorização de administrador pelo UAC. A tarefa já configurada inicia no logon sem precisar abrir o Manager como administrador.
 
-A inicialização usa um caminho instalado fixo. Ao atualizar esse arquivo, encerre o Manager pela bandeja antes de substituí-lo. Preserve a pasta de dados para manter os perfis.
+A inicialização usa um caminho instalado fixo. O botão **Buscar atualizações** baixa `DiscordVPNManager.exe` e `DiscordVPNManager-Windows.sha256` da release pública, exige HTTPS e URLs deste repositório, verifica SHA-256 antes de instalar e novamente no arquivo preparado. Após sua confirmação, fecha somente o Manager, substitui o executável de forma atômica com cópia `.previous` e reabre a interface. O túnel em execução, os perfis e a preferência de inicialização são preservados. Uma instalação manual também pode substituir o executável com o Manager fechado.
 
-Os testes em CI cobrem compilação, integridade dos recursos, leitura da opção de startup e rejeição de marcadores de prontidão inválidos. A ordem de inicialização foi simulada localmente; o PC não foi reiniciado para o teste.
+O hash detecta downloads corrompidos; ele não é uma assinatura digital independente do GitHub. O computador precisa conseguir acessar a API e os downloads públicos do GitHub. A consulta é manual, sem exigir login ou token. Para publicar novas versões, inclua os dois arquivos na release estável e aumente a versão em `Properties/AssemblyInfo.cs`.
+
+Os testes em CI cobrem compilação, leitura da opção de startup, rejeição de marcadores de prontidão inválidos, versões de releases, URLs de download e checksums. Localmente também foram testados o download real com SHA-256 e a instalação em pasta de teste, incluindo a recusa de um arquivo adulterado. O teste desta atualização não exige reiniciar o PC.
 
 ## Dependências
 

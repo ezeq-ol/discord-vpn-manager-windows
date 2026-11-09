@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -13,7 +13,7 @@ using System.Windows.Forms;
 
 namespace DiscordVPNManager
 {
-	internal sealed class MainForm : Form
+	internal sealed partial class MainForm : Form
 	{
 		private static readonly Color ColorBg = Color.FromArgb(15, 17, 26);
 
@@ -23,17 +23,17 @@ namespace DiscordVPNManager
 
 		private static readonly Color ColorText = Color.FromArgb(242, 243, 245);
 
-		private static readonly Color ColorMuted = Color.FromArgb(181, 186, 193);
+		private static readonly Color ColorMuted = Color.FromArgb(151, 157, 180);
 
-		private static readonly Color ColorAccent = Color.FromArgb(126, 65, 238);
+		private static readonly Color ColorAccent = Color.FromArgb(139, 92, 246);
 
 		private static readonly Color ColorSecondary = Color.FromArgb(44, 48, 68);
 
-		private static readonly Color ColorDanger = Color.FromArgb(218, 55, 60);
+		private static readonly Color ColorDanger = Color.FromArgb(125, 48, 70);
 
-		private static readonly Color ColorGreen = Color.FromArgb(35, 165, 90);
+		private static readonly Color ColorGreen = Color.FromArgb(94, 218, 174);
 
-		private static readonly Color ColorRed = Color.FromArgb(242, 63, 67);
+		private static readonly Color ColorRed = Color.FromArgb(241, 139, 154);
 
 		private static readonly Color ColorYellow = Color.FromArgb(240, 178, 50);
 
@@ -111,13 +111,14 @@ namespace DiscordVPNManager
 			base.Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
 			base.ShowIcon = true;
 			base.ShowInTaskbar = true;
-			base.ClientSize = new Size(760, 700);
+			base.ClientSize = new Size(1080, 820);
 			DoubleBuffered = true;
 			BackColor = ColorBg;
 			ForeColor = ColorText;
 			Font = new Font("Segoe UI", 9.75f);
-			base.FormBorderStyle = FormBorderStyle.FixedSingle;
-			base.MaximizeBox = false;
+			base.FormBorderStyle = FormBorderStyle.Sizable;
+			base.MaximizeBox = true;
+            MinimumSize = new Size(970, 700);
 			base.StartPosition = FormStartPosition.CenterScreen;
 			base.AutoScaleMode = AutoScaleMode.Dpi;
 			try
@@ -156,248 +157,6 @@ namespace DiscordVPNManager
 			TraySupport.Attach(this);
 		}
 
-		private void BuildUi()
-		{
-			Label label = new Label();
-			label.Text = "Discord VPN";
-			label.Font = new Font("Segoe UI", 20f, FontStyle.Bold);
-			label.ForeColor = ColorText;
-			label.AutoSize = true;
-			label.Location = new Point(76, 12);
-			base.Controls.Add(label);
-			PictureBox pictureBox = new PictureBox();
-			pictureBox.Location = new Point(20, 16);
-			pictureBox.Size = new Size(46, 46);
-			pictureBox.SizeMode = PictureBoxSizeMode.Zoom;
-			using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("logo-transparent.png"))
-			{
-				if (stream != null)
-				{
-					using (Image original = Image.FromStream(stream))
-					{
-						pictureBox.Image = new Bitmap(original);
-					}
-				}
-				else
-				{
-					pictureBox.Image = base.Icon.ToBitmap();
-				}
-			}
-			base.Controls.Add(pictureBox);
-			Label label2 = new Label();
-			label2.Text = "Sua conexão. Seu controle. Escolha um perfil para conectar.";
-			label2.Font = new Font("Segoe UI", 9.5f);
-			label2.ForeColor = ColorMuted;
-			label2.AutoSize = true;
-			label2.Location = new Point(79, 50);
-			base.Controls.Add(label2);
-			Panel panel = new RoundedPanel();
-			panel.Location = new Point(18, 78);
-			panel.Size = new Size(724, 92);
-			panel.BackColor = ColorPanel;
-			base.Controls.Add(panel);
-			_lblTunnel = MakeStatusLabel("Túnel inativo", 14, 10, 360, 22, 11f, FontStyle.Bold, ColorRed);
-			_lblSingbox = MakeStatusLabel("sing-box: parado", 14, 36, 360, 18, 9.25f, FontStyle.Regular, ColorMuted);
-			_lblActive = MakeStatusLabel("Perfil ativo: -", 14, 60, 696, 18, 9.25f, FontStyle.Regular, ColorText);
-			_lblEndpoint = MakeStatusLabel("Endpoint: -", 380, 10, 330, 18, 9.25f, FontStyle.Regular, ColorMuted);
-			_lblDiscord = MakeStatusLabel("Discord: fechado", 380, 36, 330, 18, 9.25f, FontStyle.Regular, ColorMuted);
-			_lblEndpoint.TextAlign = ContentAlignment.MiddleRight;
-			_lblDiscord.TextAlign = ContentAlignment.MiddleRight;
-			panel.Controls.Add(_lblTunnel);
-			panel.Controls.Add(_lblSingbox);
-			panel.Controls.Add(_lblActive);
-			panel.Controls.Add(_lblEndpoint);
-			panel.Controls.Add(_lblDiscord);
-			Label label3 = new Label();
-			label3.Text = "SEUS PERFIS";
-			label3.Font = new Font("Segoe UI", 9.75f, FontStyle.Bold);
-			label3.ForeColor = ColorText;
-			label3.AutoSize = true;
-			label3.Location = new Point(18, 184);
-			base.Controls.Add(label3);
-			LinkLabel linkLabel = new LinkLabel();
-			linkLabel.Text = "Baixar perfis .conf no Proton VPN";
-			linkLabel.Location = new Point(412, 180);
-			linkLabel.Size = new Size(330, 26);
-			linkLabel.TextAlign = ContentAlignment.MiddleRight;
-			linkLabel.LinkColor = Color.FromArgb(184, 151, 255);
-			linkLabel.ActiveLinkColor = Color.White;
-			linkLabel.VisitedLinkColor = linkLabel.LinkColor;
-			linkLabel.LinkBehavior = LinkBehavior.HoverUnderline;
-			linkLabel.AccessibleDescription = "Abrir a página de downloads do Proton VPN no navegador para obter arquivos .conf.";
-			linkLabel.LinkClicked += delegate
-			{
-				try
-				{
-					Process.Start(new ProcessStartInfo("https://account.protonvpn.com/downloads")
-					{
-						UseShellExecute = true
-					});
-				}
-				catch (Exception ex)
-				{
-					MessageBox.Show(this, "Não foi possível abrir o navegador. Acesse https://account.protonvpn.com/downloads\r\n\r\n" + ex.Message, "Baixar perfis", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-				}
-			};
-			base.Controls.Add(linkLabel);
-			_list = new ListView();
-			_list.Location = new Point(18, 206);
-			_list.Size = new Size(724, 170);
-			_list.View = View.Details;
-			_list.FullRowSelect = true;
-			_list.MultiSelect = false;
-			_list.HideSelection = false;
-			_list.HeaderStyle = ColumnHeaderStyle.Nonclickable;
-			_list.BorderStyle = BorderStyle.None;
-			_list.BackColor = ColorPanel;
-			_list.ForeColor = ColorText;
-			_list.Font = new Font("Segoe UI", 9.25f);
-			_list.OwnerDraw = true;
-			_headerFont = new Font("Segoe UI", 9f, FontStyle.Bold);
-			_list.Columns.Add("Perfil", 205);
-			_list.Columns.Add("Endpoint", 285);
-			_list.Columns.Add("Modificado", 145);
-			_list.Columns.Add("Ativo", 64);
-			_list.DrawColumnHeader += delegate(object sender, DrawListViewColumnHeaderEventArgs e)
-			{
-				using (SolidBrush brush = new SolidBrush(ColorPanelSoft))
-				{
-					e.Graphics.FillRectangle(brush, e.Bounds);
-				}
-				using (SolidBrush brush2 = new SolidBrush(ColorMuted))
-				{
-					e.Graphics.DrawString(e.Header.Text, _headerFont, brush2, e.Bounds.X + 8, e.Bounds.Y + 6);
-				}
-			};
-			_list.DrawItem += delegate(object sender, DrawListViewItemEventArgs e)
-			{
-				e.DrawDefault = false;
-			};
-			_list.DrawSubItem += delegate(object sender, DrawListViewSubItemEventArgs e)
-			{
-				Color color = (e.Item.Selected ? Color.FromArgb(67, 47, 108) : ColorPanel);
-				using (SolidBrush brush = new SolidBrush(color))
-				{
-					e.Graphics.FillRectangle(brush, e.Bounds);
-				}
-				Rectangle bounds = new Rectangle(e.Bounds.X + 8, e.Bounds.Y, Math.Max(0, e.Bounds.Width - 12), e.Bounds.Height);
-				TextRenderer.DrawText(e.Graphics, e.SubItem.Text, _list.Font, bounds, ColorText, TextFormatFlags.EndEllipsis | TextFormatFlags.VerticalCenter);
-			};
-			_list.DoubleClick += delegate
-			{
-				if (_list.SelectedItems.Count > 0)
-				{
-					ApplySelected();
-				}
-			};
-			base.Controls.Add(_list);
-			_btnAdd = MakeButton("Adicionar .conf", 18, 384, 150, 32, ColorSecondary);
-			_btnAdd.Click += delegate
-			{
-				AddProfile();
-			};
-			base.Controls.Add(_btnAdd);
-			_btnOpenFolder = MakeButton("Abrir pasta", 176, 384, 120, 32, ColorSecondary);
-			_btnOpenFolder.Click += delegate
-			{
-				try
-				{
-					Directory.CreateDirectory(_profilesDir);
-					Process.Start("explorer.exe", _profilesDir);
-				}
-				catch (Exception ex)
-				{
-					MessageBox.Show(this, ex.Message, "Discord VPN", MessageBoxButtons.OK, MessageBoxIcon.Hand);
-				}
-			};
-			base.Controls.Add(_btnOpenFolder);
-			_btnRefresh = MakeButton("Atualizar", 304, 384, 100, 32, ColorSecondary);
-			_btnRefresh.Click += delegate
-			{
-				RefreshProfiles();
-				AppendLog("Lista de perfis atualizada.");
-			};
-			base.Controls.Add(_btnRefresh);
-			Label label4 = new Label();
-			label4.Text = "Dica: clique duas vezes em um perfil para aplicar.";
-			label4.ForeColor = ColorMuted;
-			label4.Font = new Font("Segoe UI", 9f);
-			label4.AutoSize = true;
-			label4.Location = new Point(424, 391);
-			base.Controls.Add(label4);
-			_btnApply = MakeButton("Conectar VPN", 18, 426, 220, 40, ColorAccent);
-			_btnApply.Click += delegate
-			{
-				ApplySelected();
-			};
-			base.Controls.Add(_btnApply);
-			_btnStop = MakeButton("Desconectar", 246, 426, 150, 40, ColorDanger);
-			_btnStop.Click += delegate
-			{
-				StopVpn();
-			};
-			base.Controls.Add(_btnStop);
-			_btnDiscord = MakeButton("Abrir Discord", 404, 426, 160, 40, ColorSecondary);
-			_btnDiscord.Click += delegate
-			{
-				OpenDiscord();
-			};
-			base.Controls.Add(_btnDiscord);
-			_lblOperation = new Label();
-			_lblOperation.Text = "Pronto";
-			_lblOperation.ForeColor = ColorMuted;
-			_lblOperation.Font = new Font("Segoe UI", 9f, FontStyle.Bold);
-			_lblOperation.TextAlign = ContentAlignment.MiddleRight;
-			_lblOperation.Location = new Point(570, 426);
-			_lblOperation.Size = new Size(172, 20);
-			base.Controls.Add(_lblOperation);
-			_progress = new ProgressBar();
-			_progress.Location = new Point(572, 452);
-			_progress.Size = new Size(170, 8);
-			_progress.Style = ProgressBarStyle.Marquee;
-			_progress.MarqueeAnimationSpeed = 0;
-			_progress.Visible = false;
-			base.Controls.Add(_progress);
-			Panel panel2 = new RoundedPanel();
-			panel2.Location = new Point(18, 480);
-			panel2.Size = new Size(724, 88);
-			panel2.BackColor = ColorPanel;
-			base.Controls.Add(panel2);
-			_startup = new CheckBox();
-			_startup.Text = "Iniciar VPN com o Windows";
-			_startup.Location = new Point(16, 12);
-			_startup.Size = new Size(460, 26);
-			_startup.Font = new Font("Segoe UI", 10f, FontStyle.Bold);
-			_startup.Checked = File.Exists(Path.Combine(_appDir, "start-with-windows.flag"));
-			panel2.Controls.Add(_startup);
-			Label value = MakeStatusLabel("Ao entrar no Windows, conectar usando o último perfil aplicado.", 16, 44, 535, 26, 9f, FontStyle.Regular, ColorMuted);
-			panel2.Controls.Add(value);
-			_btnStartup = MakeButton("Salvar opção", 558, 24, 150, 38, ColorSecondary);
-			_btnStartup.Click += delegate
-			{
-				StartupSupport.SaveStartup(this);
-			};
-			panel2.Controls.Add(_btnStartup);
-			Label label5 = new Label();
-			label5.Text = "Atividade";
-			label5.Font = new Font("Segoe UI", 9.75f, FontStyle.Bold);
-			label5.ForeColor = ColorText;
-			label5.AutoSize = true;
-			label5.Location = new Point(18, 584);
-			base.Controls.Add(label5);
-			_log = new TextBox();
-			_log.Location = new Point(18, 608);
-			_log.Size = new Size(724, 80);
-			_log.Multiline = true;
-			_log.ReadOnly = true;
-			_log.ScrollBars = ScrollBars.Vertical;
-			_log.BorderStyle = BorderStyle.None;
-			_log.BackColor = ColorPanelSoft;
-			_log.ForeColor = ColorMuted;
-			_log.Font = new Font("Consolas", 8.5f);
-			_log.TabStop = false;
-			base.Controls.Add(_log);
-		}
 
 		private static Label MakeStatusLabel(string text, int x, int y, int w, int h, float size, FontStyle style, Color color)
 		{
@@ -423,7 +182,7 @@ namespace DiscordVPNManager
 			b.ForeColor = Color.White;
 			b.Font = new Font("Segoe UI", 9.75f, FontStyle.Bold);
 			b.Cursor = Cursors.Hand;
-			b.TabStop = false;
+			b.TabStop = true;
 			b.MouseEnter += delegate
 			{
 				b.BackColor = Shift(back, 14);
@@ -725,15 +484,15 @@ namespace DiscordVPNManager
 			bool flag = IsTunnelUp();
 			Process[] array = SafeGetProcesses("sing-box");
 			Process[] array2 = SafeGetProcesses("Discord");
-			_lblTunnel.Text = (flag ? "Túnel ativo" : "Túnel inativo");
+			_lblTunnel.Text = (flag ? "Conectado" : "Desconectado");
 			_lblTunnel.ForeColor = (flag ? ColorGreen : ColorRed);
 			_lblTunnel.Text = (flag ? "● " : "● ") + _lblTunnel.Text;
-			_lblSingbox.Text = ((array.Length > 0) ? ("sing-box: em execução (PID " + array[0].Id + ")") : "sing-box: parado");
-			_lblSingbox.ForeColor = ((array.Length > 0) ? ColorGreen : ColorMuted);
+			_lblSingbox.Text = flag ? "Somente o Discord usa a VPN." : "Conecte um perfil para começar.";
+			_lblSingbox.ForeColor = ColorMuted;
 			_lblDiscord.Text = ((array2.Length > 0) ? "Discord: aberto" : "Discord: fechado");
 			_lblDiscord.ForeColor = ((array2.Length > 0) ? ColorText : ColorMuted);
 			string configEndpoint = GetConfigEndpoint();
-			_lblEndpoint.Text = ((configEndpoint != null) ? ("Endpoint: " + configEndpoint) : "Endpoint: -");
+			_lblEndpoint.Text = ((configEndpoint != null) ? (configEndpoint) : "Nenhum servidor selecionado");
 			UpdateActiveMarkers(configEndpoint);
 		}
 
@@ -1185,6 +944,7 @@ namespace DiscordVPNManager
 
 		private void SetBusy(bool busy, string operation)
 		{
+            _busy = busy;
 			bool flag = _scriptPath != null;
 			_btnApply.Enabled = !busy && flag;
 			_btnStop.Enabled = !busy && flag;
@@ -1193,9 +953,11 @@ namespace DiscordVPNManager
 			_btnRefresh.Enabled = !busy;
 			_btnDiscord.Enabled = !busy;
 			_btnStartup.Enabled = !busy && flag;
+            if (_btnUpdate != null) _btnUpdate.Enabled = !busy && !_updateBusy;
 			_startup.Enabled = !busy && flag;
 			base.UseWaitCursor = busy;
-			_progress.Visible = busy;
+			_progress.Style = ProgressBarStyle.Marquee;
+            _progress.Visible = busy;
 			_progress.MarqueeAnimationSpeed = (busy ? 30 : 0);
 			_lblOperation.Text = ((!busy) ? "Pronto" : ((operation == null) ? "Trabalhando..." : operation));
 			_lblOperation.ForeColor = (busy ? ColorYellow : ColorMuted);
