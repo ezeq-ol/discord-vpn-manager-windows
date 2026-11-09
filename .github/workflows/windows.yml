@@ -1,0 +1,23 @@
+name: Windows build
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore pinned runtime and build
+        shell: powershell
+        run: .\build.ps1
+      - name: Smoke tests
+        shell: powershell
+        run: .\tests\smoke.ps1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DiscordVPNManager-Windows
+          path: dist/DiscordVPNManager.exe
