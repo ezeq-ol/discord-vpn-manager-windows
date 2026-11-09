@@ -1,0 +1,13 @@
+/sing-box.exe
+/wintun.dll
+/dist/
+/.cache/
+/bin/
+/obj/
+*.conf
+*.log
+config.json
+last-profile.txt
+*.jks
+*.key
+.env

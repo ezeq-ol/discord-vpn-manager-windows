@@ -1,0 +1,9 @@
+{
+  "release": "v1.2.0",
+  "url": "https://github.com/ezeq-ol/discord-vpn-manager-windows/releases/download/v1.2.0/DiscordVPNManager-Windows-runtime.zip",
+  "archiveSHA256": "c776985135be944e58ca68a1aae6f5de916398bc42c57c9a0ef09a822cb0ec13",
+  "files": {
+    "sing-box.exe": "8f30682ee198855440d2a7fe070d5d3653793b2d01bb8c85eea88f93bbe7c8b9",
+    "wintun.dll": "e5da8447dc2c320edc0fc52fa01885c103de8c118481f683643cacc3220dafce"
+  }
+}
