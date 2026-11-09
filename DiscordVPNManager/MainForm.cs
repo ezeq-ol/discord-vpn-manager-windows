@@ -120,7 +120,7 @@ namespace DiscordVPNManager
 			base.MaximizeBox = true;
             MinimumSize = new Size(970, 700);
 			base.StartPosition = FormStartPosition.CenterScreen;
-			base.AutoScaleMode = AutoScaleMode.Dpi;
+			base.AutoScaleMode = AutoScaleMode.None;
 			try
 			{
 				Directory.CreateDirectory(_profilesDir);

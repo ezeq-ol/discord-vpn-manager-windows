@@ -11,6 +11,10 @@ namespace DiscordVPNManager {
   private Label _updateStatus;
   private bool _updateBusy;
   private Panel _page;
+  private float _layoutScale=1f;
+  private Action _resizeContent;
+  private bool _layoutReady;
+  private int Logical(int pixels){return (int)Math.Round(pixels*_layoutScale);}
 
   private Label LabelAt(Control parent,string text,int x,int y,int w,int h,float size,Color color,FontStyle style=FontStyle.Regular) {
    var l=MakeStatusLabel(text,x,y,w,h,size,style,color);l.BackColor=Color.Transparent;parent.Controls.Add(l);return l;
@@ -23,6 +27,12 @@ namespace DiscordVPNManager {
    l.LinkClicked+=delegate{try{Process.Start(new ProcessStartInfo(url){UseShellExecute=true});}catch(Exception ex){AppendLog(ex.Message);}};parent.Controls.Add(l);
   }
 
+  protected override void OnShown(EventArgs e) {
+   base.OnShown(e);
+   if(WindowState==FormWindowState.Normal){var area=Screen.FromControl(this).WorkingArea;Size=new Size(Math.Min(Width,area.Width),Math.Min(Height,area.Height));Location=new Point(area.X+(area.Width-Width)/2,area.Y+(area.Height-Height)/2);}
+   _layoutReady=true;if(_resizeContent!=null)_resizeContent();
+  }
+
   private void BuildUi() {
    SuspendLayout();
    var shell=new TableLayoutPanel{Dock=DockStyle.Fill,ColumnCount=2,RowCount=1,Margin=Padding.Empty,Padding=Padding.Empty,BackColor=ColorBg};
@@ -30,14 +40,14 @@ namespace DiscordVPNManager {
    var side=new Panel{Dock=DockStyle.Fill,BackColor=Color.FromArgb(18,20,32),Margin=Padding.Empty};shell.Controls.Add(side,0,0);
    var logo=new PictureBox{Location=new Point(24,30),Size=new Size(48,48),SizeMode=PictureBoxSizeMode.Zoom};
    using(var stream=Assembly.GetExecutingAssembly().GetManifestResourceStream("logo-transparent.png")){if(stream!=null){using(var im=Image.FromStream(stream))logo.Image=new Bitmap(im);}}side.Controls.Add(logo);
-   LabelAt(side,"Discord VPN",24,94,190,32,19,ColorText,FontStyle.Bold);LabelAt(side,"MANAGER / WINDOWS",26,131,190,20,8.2f,ColorMuted);
+   LabelAt(side,"Discord VPN",24,90,190,44,19,ColorText,FontStyle.Bold);LabelAt(side,"MANAGER / WINDOWS",26,140,190,24,8.2f,ColorMuted);
    LabelAt(side,"SEU ESPAÇO",26,200,184,18,8,ColorMuted,FontStyle.Bold);
    var navConnect=MakeButton("  Visão geral",16,232,192,46,Color.FromArgb(49,36,77));navConnect.TextAlign=ContentAlignment.MiddleLeft;side.Controls.Add(navConnect);
    var navProfiles=MakeButton("  Perfis WireGuard",16,286,192,46,side.BackColor);navProfiles.TextAlign=ContentAlignment.MiddleLeft;side.Controls.Add(navProfiles);
    var navActivity=MakeButton("  Atividade",16,340,192,46,side.BackColor);navActivity.TextAlign=ContentAlignment.MiddleLeft;side.Controls.Add(navActivity);
    var privacy=new RoundedPanel{Location=new Point(16,430),Size=new Size(192,114),BackColor=Color.FromArgb(28,30,45)};side.Controls.Add(privacy);
    LabelAt(privacy,"SÓ O DISCORD",16,14,160,20,8.7f,Color.FromArgb(185,163,241),FontStyle.Bold);LabelAt(privacy,"Seus outros apps usam\na conexão normal.",16,43,162,48,9.2f,ColorMuted);
-   side.Resize+=delegate{privacy.Visible=side.ClientSize.Height>740;};
+   side.Resize+=delegate{privacy.Visible=side.ClientSize.Height>Logical(740);};
    var bottom=new Panel{Dock=DockStyle.Bottom,Height=184,BackColor=side.BackColor};side.Controls.Add(bottom);
    LabelAt(bottom,"Versão "+UpdateClient.CurrentVersion.ToString(3),24,4,180,24,9,ColorMuted);
    _btnUpdate=MakeButton("Buscar atualizações",16,39,192,42,ColorSecondary);_btnUpdate.Click+=delegate{CheckForUpdates();};bottom.Controls.Add(_btnUpdate);
@@ -45,21 +55,20 @@ namespace DiscordVPNManager {
    Link(bottom,"Projeto no GitHub  ↗","https://github.com/ezeq-ol/discord-vpn-manager-windows",new Rectangle(16,132,188,30));
 
    _page=new Panel{Dock=DockStyle.Fill,AutoScroll=true,Margin=Padding.Empty,BackColor=ColorBg};shell.Controls.Add(_page,1,0);
-   var canvas=new Panel{Location=Point.Empty,Size=new Size(856,818),BackColor=ColorBg};_page.Controls.Add(canvas);
-   _page.Resize+=delegate{canvas.Width=Math.Max(710,_page.ClientSize.Width-(_page.VerticalScroll.Visible?SystemInformation.VerticalScrollBarWidth:0));};
+   var canvas=new Panel{Dock=DockStyle.Top,Size=new Size(856,818),BackColor=ColorBg};_page.Controls.Add(canvas);
    int cw=808;
-   LabelAt(canvas,"Sua conexão, sob controle.",24,24,700,40,24,ColorText,FontStyle.Bold);
-   LabelAt(canvas,"Escolha um perfil. Conecte. Abra o Discord.",26,68,700,24,10,ColorMuted);
+   LabelAt(canvas,"Sua conexão, sob controle.",24,16,700,52,24,ColorText,FontStyle.Bold);
+   LabelAt(canvas,"Escolha um perfil. Conecte. Abra o Discord.",26,72,700,26,10,ColorMuted);
    var hero=Card(canvas,110,188,cw);hero.GradientEnd=Color.FromArgb(39,30,60);hero.BorderColor=Color.FromArgb(65,49,91);
-   _lblTunnel=LabelAt(hero,"Desconectado",22,19,440,37,23,ColorRed,FontStyle.Bold);
-   _lblSingbox=LabelAt(hero,"Conecte um perfil para começar.",24,61,420,24,10,ColorMuted);
-   _lblActive=LabelAt(hero,"Perfil ativo: —",24,91,480,24,9.3f,Color.FromArgb(207,198,228));
+   _lblTunnel=LabelAt(hero,"Desconectado",22,12,440,50,23,ColorRed,FontStyle.Bold);
+   _lblSingbox=LabelAt(hero,"Conecte um perfil para começar.",24,64,420,26,10,ColorMuted);
+   _lblActive=LabelAt(hero,"Perfil ativo: —",24,94,480,26,9.3f,Color.FromArgb(207,198,228));
    var serverTitle=LabelAt(hero,"SERVIDOR",500,22,282,18,8,ColorMuted,FontStyle.Bold);serverTitle.TextAlign=ContentAlignment.MiddleRight;serverTitle.Anchor=AnchorStyles.Top|AnchorStyles.Right;
    _lblEndpoint=LabelAt(hero,"Nenhum servidor selecionado",480,46,302,25,10,ColorText);_lblEndpoint.TextAlign=ContentAlignment.MiddleRight;_lblEndpoint.Anchor=AnchorStyles.Top|AnchorStyles.Right;
    _lblDiscord=LabelAt(hero,"Discord: fechado",500,77,282,24,9,ColorMuted);_lblDiscord.TextAlign=ContentAlignment.MiddleRight;_lblDiscord.Anchor=AnchorStyles.Top|AnchorStyles.Right;
    _btnApply=MakeButton("Conectar VPN",22,132,195,42,ColorAccent);_btnApply.Click+=delegate{ApplySelected();};hero.Controls.Add(_btnApply);
    _btnStop=MakeButton("Desconectar",227,132,136,42,ColorDanger);_btnStop.Click+=delegate{StopVpn();};hero.Controls.Add(_btnStop);
-   _btnDiscord=MakeButton("Abrir Discord  ↗",373,132,159,42,ColorSecondary);_btnDiscord.Click+=delegate{OpenDiscord();};hero.Controls.Add(_btnDiscord);
+   _btnDiscord=MakeButton("Abrir Discord  ↗",373,132,175,42,ColorSecondary);_btnDiscord.Click+=delegate{OpenDiscord();};hero.Controls.Add(_btnDiscord);
    _lblOperation=LabelAt(hero,"Pronto",551,132,231,23,8.5f,ColorMuted);_lblOperation.TextAlign=ContentAlignment.MiddleRight;_lblOperation.Anchor=AnchorStyles.Top|AnchorStyles.Right;
    _progress=new ProgressBar{Location=new Point(565,163),Size=new Size(217,5),Style=ProgressBarStyle.Marquee,Visible=false,Anchor=AnchorStyles.Top|AnchorStyles.Right};hero.Controls.Add(_progress);
 
@@ -72,13 +81,13 @@ namespace DiscordVPNManager {
    _list.DrawItem+=delegate(object sender,DrawListViewItemEventArgs e){e.DrawDefault=false;};
    _list.DrawSubItem+=delegate(object sender,DrawListViewSubItemEventArgs e){Color bg=e.Item.Selected?Color.FromArgb(48,37,72):ColorPanel;using(var b=new SolidBrush(bg))e.Graphics.FillRectangle(b,e.Bounds);if(e.Item.Selected&&e.ColumnIndex==0){using(var b=new SolidBrush(ColorAccent))e.Graphics.FillRectangle(b,new Rectangle(e.Bounds.X,e.Bounds.Y+5,3,e.Bounds.Height-10));}Color color=e.ColumnIndex==3&&e.SubItem.Text=="Sim"?ColorGreen:ColorText;TextRenderer.DrawText(e.Graphics,e.SubItem.Text,_list.Font,new Rectangle(e.Bounds.X+12,e.Bounds.Y,e.Bounds.Width-17,e.Bounds.Height),color,TextFormatFlags.EndEllipsis|TextFormatFlags.VerticalCenter);};
    _list.DoubleClick+=delegate{if(_list.SelectedItems.Count>0)ApplySelected();};profiles.Controls.Add(_list);
-   _btnAdd=MakeButton("＋ Adicionar .conf",18,194,168,36,ColorSecondary);_btnAdd.Click+=delegate{AddProfile();};profiles.Controls.Add(_btnAdd);
-   _btnOpenFolder=MakeButton("Abrir pasta",196,194,118,36,ColorSecondary);_btnOpenFolder.Click+=delegate{try{Directory.CreateDirectory(_profilesDir);Process.Start("explorer.exe",_profilesDir);}catch(Exception ex){AppendLog(ex.Message);}};profiles.Controls.Add(_btnOpenFolder);
-   _btnRefresh=MakeButton("Recarregar lista",324,194,144,36,ColorSecondary);_btnRefresh.Click+=delegate{RefreshProfiles();AppendLog("Lista de perfis atualizada.");};profiles.Controls.Add(_btnRefresh);
-   var hint=LabelAt(profiles,"Duplo clique para conectar",480,197,300,28,8.5f,ColorMuted);hint.TextAlign=ContentAlignment.MiddleRight;hint.Anchor=AnchorStyles.Top|AnchorStyles.Right;
+   _btnAdd=MakeButton("＋ Adicionar .conf",18,194,178,36,ColorSecondary);_btnAdd.Click+=delegate{AddProfile();};profiles.Controls.Add(_btnAdd);
+   _btnOpenFolder=MakeButton("Abrir pasta",206,194,126,36,ColorSecondary);_btnOpenFolder.Click+=delegate{try{Directory.CreateDirectory(_profilesDir);Process.Start("explorer.exe",_profilesDir);}catch(Exception ex){AppendLog(ex.Message);}};profiles.Controls.Add(_btnOpenFolder);
+   _btnRefresh=MakeButton("Recarregar lista",342,194,156,36,ColorSecondary);_btnRefresh.Click+=delegate{RefreshProfiles();AppendLog("Lista de perfis atualizada.");};profiles.Controls.Add(_btnRefresh);
+   var hint=LabelAt(profiles,"Duplo clique para conectar",540,197,240,28,8.5f,ColorMuted);hint.TextAlign=ContentAlignment.MiddleRight;hint.Anchor=AnchorStyles.Top|AnchorStyles.Right;
 
-   profiles.Resize+=delegate{hint.Visible=profiles.Width>=780;int available=_list.ClientSize.Width;_list.Columns[0].Width=(int)(available*0.28);_list.Columns[1].Width=(int)(available*0.35);_list.Columns[3].Width=74;_list.Columns[2].Width=Math.Max(70,available-_list.Columns[0].Width-_list.Columns[1].Width-76);};
-   hero.Resize+=delegate{_lblOperation.Visible=hero.Width>=780;if(hero.Width<780)_progress.Visible=false;};
+   profiles.Resize+=delegate{hint.Visible=profiles.Width>=Logical(780);int available=_list.ClientSize.Width;_list.Columns[0].Width=(int)(available*0.28);_list.Columns[1].Width=(int)(available*0.35);_list.Columns[3].Width=Logical(80);_list.Columns[2].Width=Math.Max(Logical(70),available-_list.Columns[0].Width-_list.Columns[1].Width-Logical(82));};
+   hero.Resize+=delegate{_lblOperation.Visible=hero.Width>=Logical(830);if(hero.Width<Logical(830))_progress.Visible=false;};
    var startup=Card(canvas,580,94,cw);
    _startup=new CheckBox{Text="Iniciar VPN com o Windows",Location=new Point(20,14),Size=new Size(430,26),BackColor=Color.Transparent,ForeColor=ColorText,Font=new Font("Segoe UI",10.5f,FontStyle.Bold),Checked=File.Exists(Path.Combine(_appDir,"start-with-windows.flag"))};startup.Controls.Add(_startup);
    LabelAt(startup,"Ao entrar: bandeja → VPN pronta → Discord.",21,46,440,25,9,ColorMuted);
@@ -86,7 +95,14 @@ namespace DiscordVPNManager {
    var activity=Card(canvas,692,110,cw);LabelAt(activity,"Atividade recente",18,9,360,25,10,ColorText,FontStyle.Bold);
    _log=new TextBox{Location=new Point(18,39),Size=new Size(772,55),Multiline=true,ReadOnly=true,ScrollBars=ScrollBars.Vertical,BorderStyle=BorderStyle.None,BackColor=ColorPanel,ForeColor=ColorMuted,Font=new Font("Consolas",8.3f),TabStop=false,Anchor=AnchorStyles.Left|AnchorStyles.Top|AnchorStyles.Right};activity.Controls.Add(_log);
    navConnect.Click+=delegate{_page.ScrollControlIntoView(hero);};navProfiles.Click+=delegate{_page.ScrollControlIntoView(profiles);_list.Focus();};navActivity.Click+=delegate{_page.ScrollControlIntoView(activity);};
-   ResumeLayout(true);canvas.Width=Math.Max(710,_page.ClientSize.Width-(_page.VerticalScroll.Visible?SystemInformation.VerticalScrollBarWidth:0));
+   _resizeContent=delegate{foreach(Control card in canvas.Controls){if(card is RoundedPanel)card.Width=Math.Max(Logical(650),canvas.ClientSize.Width-Logical(48));}};
+   canvas.SizeChanged+=delegate{if(_layoutReady)_resizeContent();};
+   // Controls are authored in logical 96-DPI pixels. Set the baseline only
+   // after the complete tree exists, so WinForms scales bounds once together.
+   using(var graphics=CreateGraphics())_layoutScale=graphics.DpiX/96f;
+   AutoScaleMode=AutoScaleMode.Dpi;
+   AutoScaleDimensions=new SizeF(96f,96f);
+   ResumeLayout(true);
   }
  }
 }

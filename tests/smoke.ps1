@@ -18,3 +18,11 @@ $updateTest=Join-Path $root 'dist\UpdateTests.exe'
 if($LASTEXITCODE -ne 0){throw 'Updater test compilation failed'}
 & $updateTest (Join-Path $root 'dist\DiscordVPNManager.exe')
 if($LASTEXITCODE -ne 0){throw 'Updater tests failed'}
+
+$layoutTest=Join-Path $root 'dist\LayoutTests.exe'
+& $csc /nologo /r:System.Windows.Forms.dll /r:System.Drawing.dll ('/out:'+ $layoutTest) (Join-Path $PSScriptRoot 'LayoutTests.cs')
+if($LASTEXITCODE -ne 0){throw 'Layout test compilation failed'}
+foreach($mode in @('unaware','system')){
+ & $layoutTest (Join-Path $root 'dist\DiscordVPNManager.exe') $mode
+ if($LASTEXITCODE -ne 0){throw ('Layout tests failed: '+$mode)}
+}

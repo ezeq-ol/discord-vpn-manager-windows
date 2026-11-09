@@ -61,3 +61,7 @@ Os testes em CI cobrem compilação, leitura da opção de startup, rejeição d
 Motor sing-box: [SagerNet/sing-box](https://github.com/SagerNet/sing-box), GPL-3.0. Driver/API Wintun: [site oficial](https://www.wintun.net/). Veja `THIRD_PARTY_NOTICES.md`.
 
 App pessoal independente, sem vínculo com Discord ou Proton. O nome e o ícone do Discord identificam a aplicação à qual o túnel se destina.
+
+### Correção de escala — 1.3.1
+
+A interface usa coordenadas lógicas de 96 DPI e dimensiona seus controles conforme a escala do Windows. Os testes de layout medem a altura dos textos, largura dos botões, sobreposições e barras horizontais nos tamanhos normal, mínimo e maximizado. A correção foi validada localmente em 96 DPI (100%) e 120 DPI (125%, escala real do computador). Não é necessário alterar a escala do Windows.
