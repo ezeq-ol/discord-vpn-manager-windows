@@ -484,7 +484,7 @@ namespace DiscordVPNManager
 			bool flag = IsTunnelUp();
 			Process[] array = SafeGetProcesses("sing-box");
 			Process[] array2 = SafeGetProcesses("Discord");
-			_lblTunnel.Text = (flag ? "Conectado" : "Desconectado");
+			_lblTunnel.Text = (flag ? "Conectado" : "Desligado");
 			_lblTunnel.ForeColor = (flag ? ColorGreen : ColorRed);
 			_lblTunnel.Text = (flag ? "● " : "● ") + _lblTunnel.Text;
 			_lblSingbox.Text = flag ? "Somente o Discord usa a VPN." : "Conecte um perfil para começar.";

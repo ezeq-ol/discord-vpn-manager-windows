@@ -30,7 +30,7 @@ namespace DiscordVPNManager {
    _page=new Panel{Dock=DockStyle.Fill,AutoScroll=true,BackColor=ColorBg,Margin=Padding.Empty};shell.Controls.Add(_page,1,0);var canvas=new Panel{Dock=DockStyle.Top,Size=new Size(832,700),BackColor=ColorBg};_page.Controls.Add(canvas);
    var heading=LabelAt(canvas,"Sua conexão, sob controle.",40,30,1000,54,27,ColorText,FontStyle.Bold);var subtitle=LabelAt(canvas,"Conexão e inicialização do Discord.",40,85,1000,28,10.5f,ColorMuted);
    var hero=Card(canvas,140,188,752);_power=new PowerButton{Bounds=new Rectangle(22,30,128,128)};hero.Controls.Add(_power);_power.Click+=delegate{if(_power.Connected)StopVpn();else ApplySelected();};
-   _lblTunnel=LabelAt(hero,"Desconectado",172,23,450,48,23,ColorGreen,FontStyle.Bold);_lblSingbox=LabelAt(hero,"Somente o Discord usa a VPN.",172,73,440,27,10.5f,ColorMuted);
+   _lblTunnel=LabelAt(hero,"Desligado",172,23,450,48,23,ColorGreen,FontStyle.Bold);_lblSingbox=LabelAt(hero,"Somente o Discord usa a VPN.",172,73,440,27,10.5f,ColorMuted);
    _btnApply=MakeButton("Conectar VPN",172,112,145,44,ColorAccent);_btnApply.Click+=delegate{ApplySelected();};_btnApply.ForeColor=ColorBg;hero.Controls.Add(_btnApply);
    _btnStop=MakeButton("Desconectar",172,112,124,44,ColorDanger);_btnStop.ForeColor=Color.FromArgb(255,154,171);_btnStop.Click+=delegate{StopVpn();};hero.Controls.Add(_btnStop);
    _btnDiscord=MakeButton("Abrir Discord  ↗",306,112,151,44,ColorSecondary);_btnDiscord.Click+=delegate{OpenDiscord();};hero.Controls.Add(_btnDiscord);
