@@ -11,10 +11,11 @@ namespace DiscordVPNManager {
 
   private Control BuildCaption() {
    var bar=new Panel{Dock=DockStyle.Fill,BackColor=ColorBg,Margin=Padding.Empty};
-   var title=new Label{Text="DISCORD VPN MANAGER",AutoSize=false,Bounds=new Rectangle(22,0,300,38),Font=new Font("Segoe UI",8,FontStyle.Bold),ForeColor=ColorMuted,TextAlign=ContentAlignment.MiddleLeft,BackColor=Color.Transparent};bar.Controls.Add(title);
+   var title=new Label{Text="DISCORD VPN MANAGER",AutoSize=false,Bounds=new Rectangle(44,0,300,38),Font=new Font("Segoe UI",8,FontStyle.Bold),ForeColor=ColorMuted,TextAlign=ContentAlignment.MiddleLeft,BackColor=Color.Transparent};bar.Controls.Add(title);
+   var mark=new PictureBox{Bounds=new Rectangle(18,9,20,20),SizeMode=PictureBoxSizeMode.Zoom};using(var stream=System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("logo-transparent.png")){if(stream!=null)using(var image=Image.FromStream(stream))mark.Image=new Bitmap(image);}bar.Controls.Add(mark);
    MouseEventHandler drag=delegate(object sender,MouseEventArgs e){if(e.Button==MouseButtons.Left){ReleaseCapture();SendMessage(Handle,0x00A1,new IntPtr(2),IntPtr.Zero);}};
    MouseEventHandler maximize=delegate(object sender,MouseEventArgs e){if(e.Button==MouseButtons.Left)ToggleMaximize();};
-   bar.MouseDown+=drag;title.MouseDown+=drag;bar.MouseDoubleClick+=maximize;title.MouseDoubleClick+=maximize;
+   bar.MouseDown+=drag;title.MouseDown+=drag;mark.MouseDown+=drag;bar.MouseDoubleClick+=maximize;title.MouseDoubleClick+=maximize;
    var actions=new FlowLayoutPanel{Dock=DockStyle.Right,Width=144,FlowDirection=FlowDirection.LeftToRight,WrapContents=false,Margin=Padding.Empty,Padding=Padding.Empty};bar.Controls.Add(actions);
    var min=new CaptionButton(0){AccessibleName="Minimizar"};_captionMaximize=new CaptionButton(1){AccessibleName="Maximizar ou restaurar"};var close=new CaptionButton(2){AccessibleName="Ocultar na bandeja"};
    actions.Controls.Add(min);actions.Controls.Add(_captionMaximize);actions.Controls.Add(close);
@@ -38,7 +39,7 @@ namespace DiscordVPNManager {
  internal sealed class CaptionButton:Button {
   private readonly int kind;private bool hovered;
   public bool Restore;
-  public CaptionButton(int kind){this.kind=kind;Size=new Size(48,38);Margin=Padding.Empty;FlatStyle=FlatStyle.Flat;FlatAppearance.BorderSize=0;BackColor=Color.FromArgb(15,17,26);ForeColor=Color.FromArgb(184,190,211);TabStop=true;SetStyle(ControlStyles.UserPaint|ControlStyles.AllPaintingInWmPaint|ControlStyles.OptimizedDoubleBuffer,true);}
+  public CaptionButton(int kind){this.kind=kind;Size=new Size(48,38);Margin=Padding.Empty;FlatStyle=FlatStyle.Flat;FlatAppearance.BorderSize=0;BackColor=Color.FromArgb(11,13,20);ForeColor=Color.FromArgb(184,190,211);TabStop=true;SetStyle(ControlStyles.UserPaint|ControlStyles.AllPaintingInWmPaint|ControlStyles.OptimizedDoubleBuffer,true);}
   protected override void OnMouseEnter(EventArgs e){hovered=true;Invalidate();base.OnMouseEnter(e);}
   protected override void OnMouseLeave(EventArgs e){hovered=false;Invalidate();base.OnMouseLeave(e);}
   protected override void OnPaint(PaintEventArgs e){

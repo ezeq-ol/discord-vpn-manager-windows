@@ -15,23 +15,23 @@ namespace DiscordVPNManager
 {
 	internal sealed partial class MainForm : Form
 	{
-		private static readonly Color ColorBg = Color.FromArgb(15, 17, 26);
+		private static readonly Color ColorBg = Color.FromArgb(11, 13, 20);
 
-		private static readonly Color ColorPanel = Color.FromArgb(24, 27, 40);
+		private static readonly Color ColorPanel = Color.FromArgb(16, 19, 29);
 
 		private static readonly Color ColorPanelSoft = Color.FromArgb(20, 23, 35);
 
 		private static readonly Color ColorText = Color.FromArgb(242, 243, 245);
 
-		private static readonly Color ColorMuted = Color.FromArgb(151, 157, 180);
+		private static readonly Color ColorMuted = Color.FromArgb(154, 163, 184);
 
-		private static readonly Color ColorAccent = Color.FromArgb(139, 92, 246);
+		private static readonly Color ColorAccent = Color.FromArgb(139, 124, 255);
 
-		private static readonly Color ColorSecondary = Color.FromArgb(38, 43, 61);
+		private static readonly Color ColorSecondary = Color.FromArgb(21, 25, 39);
 
-		private static readonly Color ColorDanger = Color.FromArgb(125, 48, 70);
+		private static readonly Color ColorDanger = Color.FromArgb(42, 22, 32);
 
-		private static readonly Color ColorGreen = Color.FromArgb(94, 218, 174);
+		private static readonly Color ColorGreen = Color.FromArgb(74, 222, 159);
 
 		private static readonly Color ColorRed = Color.FromArgb(241, 139, 154);
 
@@ -489,8 +489,10 @@ namespace DiscordVPNManager
 			_lblTunnel.Text = (flag ? "● " : "● ") + _lblTunnel.Text;
 			_lblSingbox.Text = flag ? "Somente o Discord usa a VPN." : "Conecte um perfil para começar.";
 			_lblSingbox.ForeColor = ColorMuted;
-			_lblDiscord.Text = ((array2.Length > 0) ? "Discord: aberto" : "Discord: fechado");
-			_lblDiscord.ForeColor = ((array2.Length > 0) ? ColorText : ColorMuted);
+			_lblDiscord.Text = ((array2.Length > 0) ? "● aberto" : "fechado");
+			_lblDiscord.ForeColor = ((array2.Length > 0) ? ColorGreen : ColorMuted);
+			if(_power!=null){_power.Connected=flag;_power.Invalidate();}
+            if(_layoutReady&&_resizeContent!=null)_resizeContent();
 			string configEndpoint = GetConfigEndpoint();
 			_lblEndpoint.Text = ((configEndpoint != null) ? (configEndpoint) : "Nenhum servidor selecionado");
 			UpdateActiveMarkers(configEndpoint);
@@ -511,7 +513,7 @@ namespace DiscordVPNManager
 					text2 = item.Text;
 				}
 			}
-			_lblActive.Text = ((text2 != null) ? ("Perfil ativo: " + text2) : "Perfil ativo: -");
+			_lblActive.Text = ((text2 != null) ? (text2) : "—");
 		}
 
 		private static Process[] SafeGetProcesses(string name)
@@ -953,6 +955,7 @@ namespace DiscordVPNManager
 			_btnRefresh.Enabled = !busy;
 			_btnDiscord.Enabled = !busy;
 			_btnStartup.Enabled = !busy && flag;
+            if (_power != null) _power.Enabled = !busy && flag;
             if (_btnUpdate != null) _btnUpdate.Enabled = !busy && !_updateBusy;
 			_startup.Enabled = !busy && flag;
 			base.UseWaitCursor = busy;

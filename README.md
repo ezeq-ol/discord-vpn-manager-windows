@@ -73,3 +73,7 @@ Os botões laterais alternam entre Visão geral (conexão e inicialização), Pe
 ### Interface escura completa — 1.4.0
 
 O topo agora usa uma barra escura própria. Arraste pelo título para mover, dê duplo clique para maximizar/restaurar e use os botões à direita para minimizar, maximizar ou ocultar na bandeja. A janela continua redimensionável pelas bordas. A Visão geral ganhou um cartão de acesso aos perfis; botões e seleção lateral receberam novos contornos e cores. Os testes também verificam os controles da janela e o redimensionamento.
+
+### Interface de referência — 1.5.0
+
+A interface foi adaptada do HTML de referência do usuário para os controles nativos do aplicativo, com as logos do Discord preservadas. A Visão geral inclui botão circular de energia, painel de informações e cartões responsivos. A chave de inicialização salva ao clicar; se a autorização for cancelada, o estado salvo é restaurado. A página Atividade possui contador, Copiar e Limpar (somente o conteúdo exibido). Os dados de perfis e estados vêm do aplicativo, sem incorporar os exemplos do HTML. O aplicativo continua sem dependência de navegador ou fontes remotas.
