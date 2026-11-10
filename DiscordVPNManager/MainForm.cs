@@ -33,7 +33,7 @@ namespace DiscordVPNManager
 
 		private static readonly Color ColorGreen = Color.FromArgb(74, 222, 159);
 
-		private static readonly Color ColorRed = Color.FromArgb(241, 139, 154);
+		private static readonly Color ColorRed = Color.FromArgb(220, 65, 76);
 
 		private static readonly Color ColorYellow = Color.FromArgb(240, 178, 50);
 
