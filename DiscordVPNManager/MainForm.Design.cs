@@ -7,7 +7,7 @@ using System.Windows.Forms;
 namespace DiscordVPNManager {
  internal sealed partial class MainForm {
   private Button _btnUpdate;private Label _updateStatus;private bool _updateBusy;
-  private Panel _page;private float _layoutScale=1f;private Action _resizeContent;private bool _layoutReady;
+  private DarkScrollPanel _page;private float _layoutScale=1f;private Action _resizeContent;private bool _layoutReady;
   private Action<int> _navigate;private int _activeSection;private Button[] _navButtons;private PowerButton _power;
   private int Logical(int value){return (int)Math.Round(value*_layoutScale);}
   private Label LabelAt(Control parent,string text,int x,int y,int w,int h,float size,Color color,FontStyle style=FontStyle.Regular){var label=MakeStatusLabel(text,x,y,w,h,size,style,color);label.BackColor=Color.Transparent;parent.Controls.Add(label);return label;}
@@ -27,7 +27,7 @@ namespace DiscordVPNManager {
    var note=new RoundedPanel{Bounds=new Rectangle(16,264,216,104),BackColor=ColorPanel,BorderColor=Color.FromArgb(31,36,51)};side.Controls.Add(note);LabelAt(note,"ⓘ",14,14,22,24,12,Color.FromArgb(182,172,255));LabelAt(note,"Só o Discord",43,12,155,24,9,ColorText,FontStyle.Bold);LabelAt(note,"Seus outros apps\ncontinuam na conexão\nnormal.",43,38,158,59,9,ColorMuted);
    var bottom=new Panel{Dock=DockStyle.Bottom,Height=136,BackColor=side.BackColor};side.Controls.Add(bottom);LabelAt(bottom,"Versão "+UpdateClient.CurrentVersion.ToString(3),24,3,200,24,9,ColorMuted);
    _btnUpdate=MakeButton("Buscar atualizações",24,38,200,40,ColorSecondary);bottom.Controls.Add(_btnUpdate);_btnUpdate.Click+=delegate{CheckForUpdates();};_updateStatus=LabelAt(bottom,"Atualizações pelo GitHub",24,90,156,25,8,ColorMuted);Link(bottom,"Projeto ↗","https://github.com/ezeq-ol/discord-vpn-manager-windows",new Rectangle(175,90,60,25));side.Resize+=delegate{note.Visible=side.Height-bottom.Height>Logical(390);};
-   _page=new Panel{Dock=DockStyle.Fill,AutoScroll=true,BackColor=ColorBg,Margin=Padding.Empty};shell.Controls.Add(_page,1,0);var canvas=new Panel{Dock=DockStyle.Top,Size=new Size(832,700),BackColor=ColorBg};_page.Controls.Add(canvas);
+   _page=new DarkScrollPanel{Dock=DockStyle.Fill,BackColor=ColorBg,Margin=Padding.Empty};shell.Controls.Add(_page,1,0);var canvas=new Panel{Dock=DockStyle.None,Size=new Size(832,700),BackColor=ColorBg};_page.Controls.Add(canvas);
    var heading=LabelAt(canvas,"Sua conexão, sob controle.",40,30,1000,54,27,ColorText,FontStyle.Bold);var subtitle=LabelAt(canvas,"Conexão e inicialização do Discord.",40,85,1000,28,10.5f,ColorMuted);
    var hero=Card(canvas,140,188,752);_power=new PowerButton{Bounds=new Rectangle(22,30,128,128)};hero.Controls.Add(_power);_power.Click+=delegate{if(_power.Connected)StopVpn();else ApplySelected();};
    _lblTunnel=LabelAt(hero,"Desligado",172,23,450,48,23,ColorGreen,FontStyle.Bold);_lblSingbox=LabelAt(hero,"Somente o Discord usa a VPN.",172,73,440,27,10.5f,ColorMuted);
